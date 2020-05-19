@@ -168,3 +168,7 @@ tags
 .vim
 
 # End of https://www.gitignore.io/api/c,vim,ruby,macos
+
+.env
+servers.json
+test/
