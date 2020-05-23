@@ -4,6 +4,8 @@ import sys
 import ast
 import time
 import asyncio
+import logging
+import subprocess
 from datetime import datetime
 from dotenv import load_dotenv
 from tinydb import TinyDB, Query
@@ -14,11 +16,20 @@ load_dotenv()
 TOKEN = os.environ["TOKEN"]
 servers_db = TinyDB('servers.json')
 groups = {}
+formatter = "%(asctime)s %(funcName)s %(lineno)d %(message)s"
+logging.basicConfig(filename='logfile/logger.log',format=formatter)
 client = discord.Client()
+
+@client.event
+async def on_error(event):
+    type_, value, traceback_ = sys.exc_info()
+    logging.error("ERROR WAS HAPPEN! %s %s",str(type_),value)
+    logs("ERROR WAS HAPPEN! %s %s",str(type_),value)
 
 @client.event
 async def on_message(msg):
     global groups
+    logging.info('%s MESSAGE %s',msg.guild.id,msg.content)
     if msg.author.bot:
         return
     if msg.content == "/help":
@@ -44,8 +55,8 @@ async def on_message(msg):
     #     await msg.channel.send("未対応の機能です。")
     elif op=="req":
         await request(msg, client, groups)
-    elif op=="msg":
-        await sysmsg(msg, client, groups)
+    elif op=="admin":
+        await admin(msg,client,groups)
     # elif op == "admin":
     #     pass
     # else:
@@ -81,26 +92,15 @@ async def on_voice_state_update(member, before, after):
                 await member.move_to(ch)
 
 
-async def logs(msg, guild=None, cmd_msg=True):
-    global groups
-    if guild is None:
-        print('[{0}]{1}'.format(time.time(), msg))
-    else:
-        if cmd_msg:
-            print('[{0}][{1}:{2}]{3}'.format(
-                time.time(), guild.name, guild.id, msg))
-        if guild.system_channel is None:
-            pass
-        else:
-            await guild.system_channel.send('[{0}]{1}'.format(str(time.time()), msg))
-
+async def logs(msg):
+    print('[{0}]{1}'.format(time.time(), msg))
 
 @tasks.loop(seconds=10)
 async def db_save():
     global groups
     que = Query()
     servers_db.update({'data': groups}, que.id == 0)
-    await logs("DB saved.")
+    logging.info("DB saved")
     # for x in client.guilds:
     #     await logs("DB saved.", x, False)
 
@@ -108,16 +108,14 @@ async def db_save():
 @client.event
 async def on_ready():
     global groups
-    for x in client.guilds:
-        await logs("Bot is ready!", x, False)
     await logs("Bot is ready!")
+    logging.info("Bot is ready!")
 
 
 @client.event
 async def on_connect():
     global groups
-    for x in client.guilds:
-        await logs("Bot has logged in!", x, False)
+    logging.info("Bot has logged in!")
     await logs("Bot has logged in!")
     que = Query()
     temp_groups = servers_db.search(que.id == 0)[0]['data']
@@ -132,13 +130,13 @@ async def on_connect():
     db_save.start()
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
+    logging.info(str(len(client.guilds))+"個のサーバで稼働中")
 
 
 @client.event
 async def on_disconnect():
     global groups
-    for x in client.guilds:
-        await logs("Bot has been logged out!", x, False)
+    logging.info("Bot has been logged out!")
     await logs("Bot has been logged out!")
 
 
@@ -151,6 +149,7 @@ async def on_guild_join(guild):
     await guild.system_channel.send(embed=embed)
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
+    logging.info("Guild joined")
 
 
 # @client.event
@@ -240,19 +239,40 @@ async def on_reaction_add(reaction, user):
 #     else:
 #         await msg.channel.send("Unkown youtube command!")
 
-async def sysmsg(msg,client,groups):
+async def admin(msg,client,groups):
     command = msg.content.split('/', 1)[1].split(' ')
     op = command[0]
     guild = msg.guild
-    if op=="create":
+    logging.warning("Admin command %s by %s",msg.content,msg.author.id)
+    if msg.author!=431707293692985344:
+        await msg.channel.send("This command can only be run by cronちゃん.")
+        return(0)
+    if op=="msg_create":
         if msg.author==431707293692985344:
             for x in client.guilds:
-                await x.system_channel.send(command[1])
-                await msg.channel.send("Sended to "+x.name)
-        else:
-            await msg.channel.send("")
+                channels={}
+                for x2 in guild.channels:
+                    channels[x2.name]=x2.id
+                if 'お知らせ' in channels.keys():
+                    await x.get_channel(channels['お知らせ']).send(command[1])
+                    await msg.channel.send("Sended to "+x.name +" in "+x.get_channel(channels['お知らせ']).name)
+                else:
+                    await x.system_channel.send(command[1])
+                    await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
+    elif op=="show_groups":
+        if msg.author==431707293692985344:
+            await msg.channel.send(groups)
+    elif op=="logs":
+        if msg.author==431707293692985344:
+            try:
+                res = subprocess.check_output('tail logs/logger.log')
+            except:
+                await msg.channel.send("Error in puts log!")
+                logging.error("Error in puts log!")
+            await msg.channel.send(file=discord.File("logs/logger.log",filename="logger.log"))
+            await msg.channel.send(res)
     else:
-        await msg.channel.send("Unkown msg command!")
+        await msg.channel.send("Unkown admin command!")
 
 async def request(msg, client, groups):
     command = msg.content.split('/', 1)[1].split(' ')
@@ -321,12 +341,12 @@ async def role(msg, client, groups):
 
 async def helps(msg, client, groups):
     embed2 = discord.Embed(title="Help", description="")
-    embed2.add_field(name="Debug Command", value=(
-        "`debug/profile Mention` メンションされた人のプロフィールを表示します.\n"
-        "`debug/profile UserID` ID指定された人のプロフィールを表示します.\n"
-        "`debug/info` サーバーの詳細を表示します"
-        "`debug/info ServerID` コマンドを実行した人のプロフィールを表示します。"
-    ), inline=False)
+    # embed2.add_field(name="Debug Command", value=(
+    #     "`debug/profile Mention` メンションされた人のプロフィールを表示します.\n"
+    #     "`debug/profile UserID` ID指定された人のプロフィールを表示します.\n"
+    #     "`debug/info` サーバーの詳細を表示します"
+    #     "`debug/info ServerID` コマンドを実行した人のプロフィールを表示します。"
+    # ), inline=False)
     embed2.add_field(name="Voice Chat Command", value=(
         "`vc/create` 普遍的なボイスチャンネルを作成します"
     ), inline=False)
@@ -339,14 +359,12 @@ async def helps(msg, client, groups):
         "`set/req_categories <カテゴリ名>` リクエストを作成するカテゴリを指定します。\n"
         "`set/req_ad_categories <カテゴリ名>` リクエスト(admin)を作成するカテゴリを指定します。\n"
     ), inline=False)
-    embed2.add_field(name="Manage Command", value=(
-        "`mng/ban <Mention>` Ban\n"
-        "`mng/kick <Mention>` Kick.\n"
-        "`mng/unban <Mention>` Unban\n"
-        "`mng/bans` Show listed bans."
-    ), inline=False)
     embed2.add_field(name="Request Manege Command", value=(
         "`req/create <title>` 新規リクエストを作成します。\n"
+        "`req/close` リクエストを終了します。\n"
+    ), inline=False)
+    embed2.add_field(name="Admin Command", value=(
+        "`admin/msg_create <message>` Server Managerが参加しているギルド全てにメッセージを送信します。\n"
         "`req/close` リクエストを終了します。\n"
     ), inline=False)
     # embed2.add_field(name="Youtube&Twitter Command", value=(
