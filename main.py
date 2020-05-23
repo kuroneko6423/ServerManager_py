@@ -264,7 +264,7 @@ async def admin(msg,client,groups):
         if msg.author.id==431707293692985344:
             await msg.channel.send(file=discord.File("logs/logger.log",filename="logger.log"))
             res = subprocess.check_output(['tail', 'logs/logger.log'])
-            await msg.channel.send(res)
+            await msg.channel.send(res.replace('\\n','\n'))
     else:
         await msg.channel.send("Unkown admin command!")
 
