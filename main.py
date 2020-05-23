@@ -242,11 +242,11 @@ async def admin(msg,client,groups):
     op = command[0]
     guild = msg.guild
     logging.warning("Admin command %s by %s",msg.content,msg.author.id)
-    if msg.author!=431707293692985344:
+    if msg.author.id!=431707293692985344:
         await msg.channel.send("This command can only be run by cronちゃん.")
         return(0)
     if op=="msg_create":
-        if msg.author==431707293692985344:
+        if msg.author.id==431707293692985344:
             for x in client.guilds:
                 channels={}
                 for x2 in guild.channels:
@@ -258,10 +258,10 @@ async def admin(msg,client,groups):
                     await x.system_channel.send(command[1])
                     await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
     elif op=="show_groups":
-        if msg.author==431707293692985344:
+        if msg.author.id==431707293692985344:
             await msg.channel.send(groups)
     elif op=="logs":
-        if msg.author==431707293692985344:
+        if msg.author.id==431707293692985344:
             try:
                 res = subprocess.check_output('tail logs/logger.log')
             except:
