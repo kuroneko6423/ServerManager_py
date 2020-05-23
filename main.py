@@ -130,7 +130,7 @@ async def on_connect():
             vc_ch[int(k2)]=v2
         groups[k]["vc_ch"]=vc_ch
     db_save.start()
-    await client.change_presence(activity=discord.CustomActivity(str(len(client.guilds))+"個のサーバで稼働中"))
+    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
 
 
@@ -149,7 +149,7 @@ async def on_guild_join(guild):
     embed = discord.Embed(
     title="Hi!", description="I'm a server management bot!\nAnd if you don't know how to use it, just say '/help`!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
-    await client.change_presence(activity=CustomActivity(str(len(client.guilds))+"個のサーバで稼働中"))
+    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
 
 
