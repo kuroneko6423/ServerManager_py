@@ -345,6 +345,7 @@ async def helps(msg, client, groups):
         "`twitter/remove <TwitterのID>` アカウントを通知リストから削除します。\n"
         # "`mng/bans` Show listed bans."
     ), inline=False)
+    embed.add_field(name="Help Center", value=("以下のURLに詳しい説明が載っています。是非ご参照ください。\nhttps://qiita.com/k439_/items/96b8a832642ace52b148")
 #   embed.add_field(name="System Command ( Only use cronちゃん )",value=(
 #     "`sys/save`\n"
 #     "`sys/load`"
