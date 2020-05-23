@@ -130,7 +130,6 @@ async def on_connect():
             vc_ch[int(k2)]=v2
         groups[k]["vc_ch"]=vc_ch
     db_save.start()
-    activity=discord.CustomActivity("")
     client.change_presence(activity=discord.CustomActivity(str(len(client.guilds()))+"個のサーバで稼働中"))
 
 
