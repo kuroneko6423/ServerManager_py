@@ -16,7 +16,7 @@ load_dotenv()
 TOKEN = os.environ["TOKEN"]
 servers_db = TinyDB('servers.json')
 groups = {}
-formatter = "%(asctime)s %(funcName)s %(lineno)d %(message)s"
+formatter = "%(asctime)s %(levelname)s %(funcName)s %(lineno)d %(message)s"
 logging.basicConfig(filename='logs/logger.log',format=formatter)
 client = discord.Client()
 
@@ -24,7 +24,7 @@ client = discord.Client()
 async def on_error(event):
     type_, value, traceback_ = sys.exc_info()
     logging.error("ERROR WAS HAPPEN! %s %s",str(type_),value)
-    logs("ERROR WAS HAPPEN! %s %s",str(type_),value)
+    logs("ERROR WAS HAPPEN! "+str(type_)+" "+value)
 
 @client.event
 async def on_message(msg):
@@ -262,12 +262,8 @@ async def admin(msg,client,groups):
             await msg.channel.send(groups)
     elif op=="logs":
         if msg.author.id==431707293692985344:
-            try:
-                res = subprocess.check_output('tail logs/logger.log')
-            except:
-                await msg.channel.send("Error in puts log!")
-                logging.error("Error in puts log!")
             await msg.channel.send(file=discord.File("logs/logger.log",filename="logger.log"))
+            res = subprocess.check_output('tail logs/logger.log')
             await msg.channel.send(res)
     else:
         await msg.channel.send("Unkown admin command!")
