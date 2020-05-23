@@ -57,8 +57,6 @@ async def on_message(msg):
         await request(msg, client, groups)
     elif op=="admin":
         await admin(msg,client,groups)
-    # elif op == "admin":
-    #     pass
     # else:
     #     await msg.channel.send("Unknown op!")
 
@@ -364,8 +362,9 @@ async def helps(msg, client, groups):
         "`req/close` リクエストを終了します。\n"
     ), inline=False)
     embed2.add_field(name="Admin Command", value=(
-        "`admin/msg_create <message>` Server Managerが参加しているギルド全てにメッセージを送信します。\n"
-        "`req/close` リクエストを終了します。\n"
+        "`admin/msg_create` Server Managerが参加している全てのギルドへメッセージを一斉送信します。\n"
+        "`admin/show_groups` 変数'groups'を表示します。\n"
+        "`admin/logs` 直近のlogs10行とlogsファイルを表示します。"
     ), inline=False)
     # embed2.add_field(name="Youtube&Twitter Command", value=(
     #     "`youtube/set <YoutubeのチャンネルのURL>` チャンネルにアップロードをした際に、通知をします。\n"
