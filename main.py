@@ -25,16 +25,6 @@ async def on_message(msg):
     if msg.content == "/help":
         await helps(msg, client, groups)
         return 0
-    elif msg.content == "/load":
-    #     que = Query()
-    #     servers_db.update({'data': groups}, que.id == 0)
-    #     await logs("DB saved.")
-    #     for x in client.guilds:
-    #         await logs("DB saved.", x, False)
-    #     groups = servers_db.search(que.id == 0)[0]['data']
-        if 712633963260280873 not in groups:
-            groups[712633963260280873] = {}
-            return 0
     op = msg.content.split('/', 1)[0]
     if op == "debug":
         await debug(msg, client, groups)
@@ -309,48 +299,48 @@ async def role(msg, client, groups):
 
 
 async def helps(msg, client, groups):
-    embed = discord.Embed(title="Help", description="")
-    embed.add_field(name="Debug Command", value=(
+    embed2 = discord.Embed(title="Help", description="")
+    embed2.add_field(name="Debug Command", value=(
         "`debug/profile Mention` メンションされた人のプロフィールを表示します.\n"
         "`debug/profile UserID` ID指定された人のプロフィールを表示します.\n"
         "`debug/info` サーバーの詳細を表示します"
         "`debug/info ServerID` コマンドを実行した人のプロフィールを表示します。"
     ), inline=False)
-    embed.add_field(name="Voice Chat Command", value=(
+    embed2.add_field(name="Voice Chat Command", value=(
         "`vc/create` 普遍的なボイスチャンネルを作成します"
     ), inline=False)
-    embed.add_field(name="Role setup Command", value=(
+    embed2.add_field(name="Role setup Command", value=(
         "`role/create` リアクションをつけるとロール付与されるメッセージを作成します。"
     ), inline=False)
-    embed.add_field(name="Setting Command", value=(
+    embed2.add_field(name="Setting Command", value=(
         "`set/creater_role` クリエイターロールを設定します。設定することにより、クリエイターしかコマンドを実行できなくなります。\n"
         "`set/vc_categories <カテゴリ名>` VCを作成するカテゴリを指定します。\n"
         "`set/req_categories <カテゴリ名>` リクエストを作成するカテゴリを指定します。\n"
         "`set/req_ad_categories <カテゴリ名>` リクエスト(admin)を作成するカテゴリを指定します。\n"
     ), inline=False)
-    embed.add_field(name="Manage Command", value=(
+    embed2.add_field(name="Manage Command", value=(
         "`mng/ban <Mention>` Ban\n"
         "`mng/kick <Mention>` Kick.\n"
         "`mng/unban <Mention>` Unban\n"
         "`mng/bans` Show listed bans."
     ), inline=False)
-    embed.add_field(name="Request Manege Command", value=(
+    embed2.add_field(name="Request Manege Command", value=(
         "`req/create <title>` 新規リクエストを作成します。\n"
         "`req/close` リクエストを終了します。\n"
     ), inline=False)
-    embed.add_field(name="Youtube&Twitter Command", value=(
+    embed2.add_field(name="Youtube&Twitter Command", value=(
         "`youtube/set <YoutubeのチャンネルのURL>` チャンネルにアップロードをした際に、通知をします。\n"
         "`twitter/set <TwitterのID>` Tweetをした際に、通知をします。\n"
         "`youtube/remove <YoutubeのチャンネルのURL>` チャンネルを通知リストから削除します。\n"
         "`twitter/remove <TwitterのID>` アカウントを通知リストから削除します。\n"
         # "`mng/bans` Show listed bans."
     ), inline=False)
-    embed.add_field(name="Help Center", value=("以下のURLに詳しい説明が載っています。是非ご参照ください。\nhttps://qiita.com/k439_/items/96b8a832642ace52b148")
+    embed2.add_field(name="Help Center", value=("以下のURLに詳しい説明が載っています。是非ご参照ください。\nhttps://qiita.com/k439_/items/96b8a832642ace52b148")
 #   embed.add_field(name="System Command ( Only use cronちゃん )",value=(
 #     "`sys/save`\n"
 #     "`sys/load`"
 #     ),inline=False)
-    await msg.channel.send(embed=embed)
+    await msg.channel.send(embed=embed2)
 
 
 async def debug(msg, client, groups):
