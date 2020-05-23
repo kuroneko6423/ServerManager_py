@@ -16,7 +16,6 @@ servers_db = TinyDB('servers.json')
 groups = {}
 client = discord.Client()
 
-
 @client.event
 async def on_message(msg):
     global groups
@@ -38,13 +37,15 @@ async def on_message(msg):
     elif op == "role":
         await role(msg, client, groups)
         # await msg.channel.send("mi")
-    elif op == "ytb":
-        await msg.channel.send("未対応の機能です")
-        # await youtube(msg, client, groups)
-    elif op == "twt":
-        await msg.channel.send("未対応の機能です。")
+    # elif op == "ytb":
+    #     await msg.channel.send("未対応の機能です")
+    #     # await youtube(msg, client, groups)
+    # elif op == "twt":
+    #     await msg.channel.send("未対応の機能です。")
     elif op=="req":
         await request(msg, client, groups)
+    elif op=="msg":
+        await sysmsg(msg, client, groups)
     # elif op == "admin":
     #     pass
     # else:
@@ -129,6 +130,8 @@ async def on_connect():
             vc_ch[int(k2)]=v2
         groups[k]["vc_ch"]=vc_ch
     db_save.start()
+    activity=discord.CustomActivity("")
+    client.change_presence(activity=discord.CustomActivity(str(len(client.guilds()))+"個のサーバで稼働中"))
 
 
 @client.event
@@ -146,6 +149,7 @@ async def on_guild_join(guild):
     embed = discord.Embed(
     title="Hi!", description="I'm a server management bot!\nAnd if you don't know how to use it, just say '/help`!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
+    client.change_presence(activity=CustomActivity(str(len(client.guilds()))+"個のサーバで稼働中"))
 
 
 # @client.event
@@ -218,20 +222,36 @@ async def on_reaction_add(reaction, user):
 #         await msg.channel.send("Unknown mng command!")
 
 
-async def youtube(msg,client,groups):
+# async def youtube(msg,client,groups):
+#     command = msg.content.split('/', 1)[1].split(' ')
+#     op = command[0]
+#     guild = msg.guild
+#     if 'youtube_ch' not in groups[guild.id].keys():
+#         groups[guild.id]['youtube_ch']={}
+#     if op=="set":
+#         groups[guild.id]['youtube_ch'][str(command[1])]=''
+#         await msg.channel.send("Created")
+#     elif op=="remove":
+#         groups[guild.id]['youtube_ch'].pop(str(command[1]))
+#         await msg.channel.send("Removed")
+#     elif op=="lists":
+#         await msg.channel.send("".join(list(map(lambda x: str(x)+"\n",groups[guild.id]['youtube_ch'].keys()))))
+#     else:
+#         await msg.channel.send("Unkown youtube command!")
+
+async def sysmsg(msg,client,groups):
     command = msg.content.split('/', 1)[1].split(' ')
     op = command[0]
     guild = msg.guild
-    if 'youtube_ch' not in groups[guild.id].keys():
-        groups[guild.id]['youtube_ch']=[]
-    if op=="set":
-        pass
-    elif op=="remove":
-        pass
-    elif op=="lists":
-        pass
+    if op=="create":
+        if msg.author==431707293692985344:
+            for x in client.guilds:
+                await x.system_channel.send(command[1])
+                await msg.channel.send("Sended to "+x.name)
+        else:
+            await msg.channel.send("")
     else:
-        await msg.channel.send("Unkown youtube command!")
+        await msg.channel.send("Unkown msg command!")
 
 async def request(msg, client, groups):
     command = msg.content.split('/', 1)[1].split(' ')
@@ -328,13 +348,13 @@ async def helps(msg, client, groups):
         "`req/create <title>` 新規リクエストを作成します。\n"
         "`req/close` リクエストを終了します。\n"
     ), inline=False)
-    embed2.add_field(name="Youtube&Twitter Command", value=(
-        "`youtube/set <YoutubeのチャンネルのURL>` チャンネルにアップロードをした際に、通知をします。\n"
-        "`twitter/set <TwitterのID>` Tweetをした際に、通知をします。\n"
-        "`youtube/remove <YoutubeのチャンネルのURL>` チャンネルを通知リストから削除します。\n"
-        "`twitter/remove <TwitterのID>` アカウントを通知リストから削除します。\n"
-        # "`mng/bans` Show listed bans."
-    ), inline=False)
+    # embed2.add_field(name="Youtube&Twitter Command", value=(
+    #     "`youtube/set <YoutubeのチャンネルのURL>` チャンネルにアップロードをした際に、通知をします。\n"
+    #     "`twitter/set <TwitterのID>` Tweetをした際に、通知をします。\n"
+    #     "`youtube/remove <YoutubeのチャンネルのURL>` チャンネルを通知リストから削除します。\n"
+    #     "`twitter/remove <TwitterのID>` アカウントを通知リストから削除します。\n"
+    #     # "`mng/bans` Show listed bans."
+    # ), inline=False)
     embed2.add_field(name="Help Center", value=("以下のURLに詳しい説明が載っています。是非ご参照ください。\nhttps://qiita.com/k439_/items/96b8a832642ace52b148"))
 #   embed.add_field(name="System Command ( Only use cronちゃん )",value=(
 #     "`sys/save`\n"
