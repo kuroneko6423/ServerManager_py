@@ -17,7 +17,7 @@ TOKEN = os.environ["TOKEN"]
 servers_db = TinyDB('servers.json')
 groups = {}
 formatter = "%(levelname)s %(asctime)s %(levelname)s %(funcName)s %(lineno)d %(message)s"
-logging.basicConfig(filename='logs/logger.log',format=formatter)
+logging.basicConfig(filename='logs/logger.log',format=formatter,evel=logging.DEBUG)
 client = discord.Client()
 
 @client.event
