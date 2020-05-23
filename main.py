@@ -23,15 +23,15 @@ client = discord.Client()
 @client.event
 async def on_error(a,b):
     type_, value, traceback_ = sys.exc_info()
-    logs("ERROR WAS HAPPEN! "+str(type_)+" "+value)
+    logs("ERROR WAS HAPPEN! {0} {1}".format(str(type_),value))
     logging.error("ERROR WAS HAPPEN! %s %s",str(type_),value)
 
 @client.event
 async def on_message(msg):
     global groups
-    logging.info('%s MESSAGE %s',msg.guild.id,msg.content)
     if msg.author.bot:
         return
+    logging.info('%s MESSAGE %s',msg.guild.id,msg.content)
     if msg.content == "/help":
         await helps(msg, client, groups)
         return 0
@@ -250,9 +250,9 @@ async def admin(msg,client,groups):
             for x in client.guilds:
                 channels={}
                 for x2 in guild.channels:
-                    channels[x2.name]=x2.id
+                    channels[x2.name]=x2
                 if 'お知らせ' in channels.keys():
-                    await x.get_channel(channels['お知らせ']).send(command[1])
+                    await x2.send(command[1])
                     await msg.channel.send("Sended to "+x.name +" in "+x.get_channel(channels['お知らせ']).name)
                 else:
                     await x.system_channel.send(command[1])
