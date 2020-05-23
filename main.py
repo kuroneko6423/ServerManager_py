@@ -50,6 +50,7 @@ async def on_message(msg):
         # await msg.channel.send("mi")
     elif op == "ytb":
         await msg.channel.send("未対応の機能です")
+        # await youtube(msg, client, groups)
     elif op == "twt":
         await msg.channel.send("未対応の機能です。")
     elif op=="req":
@@ -226,6 +227,22 @@ async def on_reaction_add(reaction, user):
 #     else:
 #         await msg.channel.send("Unknown mng command!")
 
+
+async def youtube(msg,client,groups):
+    command = msg.content.split('/', 1)[1].split(' ')
+    op = command[0]
+    guild = msg.guild
+    if 'youtube_ch' not in groups[guild.id].keys():
+        groups[guild.id]['youtube_ch']=[]
+    if op=="set":
+        pass
+    elif op=="remove":
+        pass
+    elif op=="lists":
+        pass
+    else:
+        await msg.channel.send("Unkown youtube command!")
+
 async def request(msg, client, groups):
     command = msg.content.split('/', 1)[1].split(' ')
     op = command[0]
@@ -318,7 +335,7 @@ async def helps(msg, client, groups):
         "`mng/bans` Show listed bans."
     ), inline=False)
     embed.add_field(name="Request Manege Command", value=(
-        "`req/new <title>` 新規リクエストを作成します。\n"
+        "`req/create <title>` 新規リクエストを作成します。\n"
         "`req/close` リクエストを終了します。\n"
     ), inline=False)
     embed.add_field(name="Youtube&Twitter Command", value=(
