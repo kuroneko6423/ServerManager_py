@@ -103,7 +103,7 @@ async def db_save():
     logging.info("DB saved")
 
 
-@tasks.loop(seconds=10)
+@tasks.loop(minutes=60)
 async def ad():
     global groups
     global ads
@@ -122,6 +122,7 @@ async def on_ready():
     global groups
     print("Bot is ready")
     logging.info("Bot is ready!")
+    ad.start()
 
 
 @client.event
@@ -141,7 +142,6 @@ async def on_connect():
                     vc_ch[int(k2)]=v2
                 groups[k]["vc_ch"]=vc_ch
     db_save.start()
-    ad.start()
     print(str(len(client.guilds))+"個のサーバで稼働中")
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
