@@ -208,7 +208,7 @@ async def admin(msg,client,groups):
                     # else:
                     #     await x.system_channel.send(command[1])
                     #     await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
-                    await x.system_channel.send(command[1])
+                    await x.system_channel.send(" ".join(command[1:]))
                     await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
                 except Exception as e:
                     print(e)
