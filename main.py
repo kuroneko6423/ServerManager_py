@@ -252,8 +252,8 @@ async def admin(msg,client,groups):
                 for x2 in guild.channels:
                     channels[x2.name]=x2
                 if 'お知らせ' in channels.keys():
-                    await x2.send(command[1])
-                    await msg.channel.send("Sended to "+x.name +" in "+x.get_channel(channels['お知らせ']).name)
+                    await channels['お知らせ'].send(command[1])
+                    await msg.channel.send("Sended to "+x.name +" in "+channels['お知らせ'].name)
                 else:
                     await x.system_channel.send(command[1])
                     await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
