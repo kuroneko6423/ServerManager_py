@@ -5,6 +5,7 @@ import ast
 import time
 import asyncio
 import logging
+import random
 import subprocess
 from datetime import datetime
 from dotenv import load_dotenv
@@ -19,6 +20,11 @@ groups = {}
 formatter = "%(levelname)s %(asctime)s %(funcName)s %(lineno)d %(message)s"
 logging.basicConfig(filename='logs/logger.log',format=formatter,level=logging.INFO)
 client = discord.Client()
+ads = [
+    ["このbotをあなたのサーバに導入しませんか？","↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!"],
+    ["サポートが必要ですか？？","↓↓この記事を見てみよう！↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n作成者の連絡先も載ってるよ！"],
+    ["INFOの表示頻度が高すぎて、ウザい!?","↓↓このコマンドで表示頻度を設定しよう!\n`未対応です`"]
+    ]
 
 # @client.event
 # async def on_error(a,b):
@@ -97,13 +103,14 @@ async def db_save():
     logging.info("DB saved")
 
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=60)
 async def ad():
     global groups
     print(client.guilds)
     for x in client.guilds:
         try:
-            embed = discord.Embed(title="このbotをあなたのサーバに導入しませんか？", description="↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!", color=discord.Colour.red())
+            ad = random.choice(ad)
+            embed = discord.Embed(title="[INFO]"+ad[0], description=ad[1], color=discord.Colour.red())
             await x.system_channel.send(embed=embed)
         except Exception as e:
             print(e)
