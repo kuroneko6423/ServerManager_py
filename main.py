@@ -113,6 +113,7 @@ async def ad():
             ad = random.choice(ads)
             embed = discord.Embed(title="[INFO]"+ad[0], description=ad[1], color=discord.Colour.red())
             await x.system_channel.send(embed=embed)
+            print("Sended to "+str(x.name))
         except Exception as e:
             print(e)
 
