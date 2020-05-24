@@ -175,7 +175,7 @@ async def on_reaction_add(reaction, user):
     global groups
     guild = reaction.message.guild
     if 'reaction_msgs' not in groups[guild.id]:
-
+        groups[guild.id]['reaction_msgs']={}
     if str(reaction.message.id) in groups[guild.id]['reaction_msgs'].keys():
         if str(reaction.emoji) == groups[guild.id]['reaction_msgs'][str(reaction.message.id)][0]:
             await user.add_roles(guild.get_role(int(groups[guild.id]['reaction_msgs'][str(reaction.message.id)][1])))
