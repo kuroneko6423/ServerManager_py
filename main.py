@@ -20,11 +20,11 @@ formatter = "%(levelname)s %(asctime)s %(funcName)s %(lineno)d %(message)s"
 logging.basicConfig(filename='logs/logger.log',format=formatter,level=logging.INFO)
 client = discord.Client()
 
-@client.event
-async def on_error(a,b):
-    type_, value, traceback_ = sys.exc_info()
-    logs("ERROR WAS HAPPEN! {0} {1}".format(str(type_),value))
-    logging.error("ERROR WAS HAPPEN! %s %s",str(type_),value)
+# @client.event
+# async def on_error(a,b):
+#     type_, value, traceback_ = sys.exc_info()
+#     logs("ERROR WAS HAPPEN! {0} {1}".format(str(type_),value))
+#     logging.error("ERROR WAS HAPPEN! %s %s",str(type_),value)
 
 @client.event
 async def on_message(msg):
@@ -42,24 +42,23 @@ async def on_message(msg):
         await vc(msg, client, groups)
     elif op == "set":
         await sets(msg, client, groups)
-    elif op == "mng":
-        # await mng(msg, client, groups)
-        await msg.channel.send("未対応の機能です")
     elif op == "role":
         await role(msg, client, groups)
+    elif op=="req":
+        await request(msg, client, groups)
+    elif op=="admin":
+        await admin(msg,client,groups)
+    # elif op == "mng":
+        # await mng(msg, client, groups)
+        # await msg.channel.send("未対応の機能です")
         # await msg.channel.send("mi")
     # elif op == "ytb":
     #     await msg.channel.send("未対応の機能です")
     #     # await youtube(msg, client, groups)
     # elif op == "twt":
     #     await msg.channel.send("未対応の機能です。")
-    elif op=="req":
-        await request(msg, client, groups)
-    elif op=="admin":
-        await admin(msg,client,groups)
     # else:
     #     await msg.channel.send("Unknown op!")
-
 
 
 @client.event
@@ -70,7 +69,7 @@ async def on_voice_state_update(member, before, after):
     else:
         guild = before.channel.guild
     await guild.system_channel.send('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
-    # print('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
+    logging.info('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
     if before.channel != None:
         if before.channel.members == []:
             if before.channel.id in groups[guild.id]['vc_ch']:
@@ -90,23 +89,26 @@ async def on_voice_state_update(member, before, after):
                 await member.move_to(ch)
 
 
-def logs(msg):
-    print('[{0}]{1}'.format(time.time(), msg))
-
 @tasks.loop(seconds=10)
 async def db_save():
     global groups
     que = Query()
     servers_db.update({'data': groups}, que.id == 0)
     logging.info("DB saved")
-    # for x in client.guilds:
-    #     await logs("DB saved.", x, False)
+
+
+@tasks.loop(minutes=60)
+async def ad():
+    global groups
+    for x in client.guilds:
+        embed = discord.Embed(title="このbotをあなたのサーバに導入しませんか？", description="↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!", color=discord.Colour.red())
+        await x.system_channel.send(embed=embed)
 
 
 @client.event
 async def on_ready():
     global groups
-    logs("Bot is ready!")
+    print("Bot is ready")
     logging.info("Bot is ready!")
 
 
@@ -114,7 +116,7 @@ async def on_ready():
 async def on_connect():
     global groups
     logging.info("Bot has logged in!")
-    logs("Bot has logged in!")
+    print("Bot has logged in!")
     que = Query()
     temp_groups = servers_db.search(que.id == 0)[0]['data']
     groups = {}
@@ -126,6 +128,8 @@ async def on_connect():
             vc_ch[int(k2)]=v2
         groups[k]["vc_ch"]=vc_ch
     db_save.start()
+    ad.start()
+    print(str(len(client.guilds))+"個のサーバで稼働中")
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
     logging.info(str(len(client.guilds))+"個のサーバで稼働中")
@@ -135,107 +139,38 @@ async def on_connect():
 async def on_disconnect():
     global groups
     logging.info("Bot has been logged out!")
-    logs("Bot has been logged out!")
+    print("Bot has been logged out!")
 
 
 @client.event
 async def on_guild_join(guild):
     global groups
     groups[guild.id] = {}
-    embed = discord.Embed(
-    title="Hi!", description="I'm a server management bot!\nAnd if you don't know how to use it, just say '/help`!", color=discord.Colour.red())
+    embed = discord.Embed(title="Hi!", description="I'm a server management bot!\nAnd if you don't know how to use it, just say '/help`!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
+    print(str(len(client.guilds))+"個のサーバで稼働中")
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
     logging.info("Guild joined")
 
 
-# @client.event
-# async def on_raw_reaction_add(payload):
-#     global groups
-#     guild = client.get_guild(payload.guild_id)
-#     if str(payload.message_id) in groups[guild.id]['reaction_msgs']:
-#         if str(payload.emoji) == groups[guild.id]['reaction_msgs'][payload.message_id][0]:
-#             await client.get_user(payload.user_id).add_roles(guild.get_role(int(groups[guild.id]['reaction_msgs'][payload.message_id][1])))
-
 @client.event
 async def on_reaction_add(reaction, user):
-    print("a")
     global groups
-    print("a")
     guild = reaction.message.guild
-    print("a")
     if str(reaction.message.id) in groups[guild.id]['reaction_msgs'].keys():
-        print("a")
         if str(reaction.emoji) == groups[guild.id]['reaction_msgs'][str(reaction.message.id)][0]:
-            print("a")
             await user.add_roles(guild.get_role(int(groups[guild.id]['reaction_msgs'][str(reaction.message.id)][1])))
-            print("a")
-
-# @client.event
-# async def on_raw_reaction_remove(payload):
-#     global groups
-#     guild = client.get_guild(payload.guild_id)
-#     if str(payload.message_id) in groups[guild.id]['reaction_msgs']:
-#         if str(payload.emoji) == groups[guild.id]['reaction_msgs'][reaction.message.id][0]:
-#             await client.get_user(payload.user_id).remove_roles(guild.get_role(int(groups[guild.id]['reaction_msgs'][reaction.message.id][1])))
 
 
-# async def mng(msg, client, groups):
-#     command = msg.content.split('/', 1)[1].split(' ')
-#     op = command[0]
-#     guild = msg.guild
-#     if op == "ban":
-#         if 'creater_role' not in groups[msg.guild.id]:
-#             await msg.channel.send("Please set creater's role!")
-#             return(0)
-#         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-#             await msg.channel.send("It's only creater's command!")
-#             return(0)
-#         for x in msg.raw_mentions():
-#             await msg.guild.ban(client.get_user(x))
-#             await msg.channel.send("Baned")
-#     elif op == "unban":
-#         if 'creater_role' not in groups[msg.guild.id]:
-#             await msg.channel.send("Please set creater's role!")
-#             return(0)
-#         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-#             await msg.channel.send("It's only creater's command!")
-#             return(0)
-#         for x in msg.raw_mentions():
-#             await msg.guild.unban(client.get_user(x))
-#             await msg.channel.send("Unbaned")
-#     elif op == "kick":
-#         if 'creater_role' not in groups[msg.guild.id]:
-#             await msg.channel.send("Please set creater's role!")
-#             return(0)
-#         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-#             await msg.channel.send("It's only creater's command!")
-#             return(0)
-#         print(str(msg.raw_mentions()))
-#         for x in msg.raw_mentions():
-#             await msg.guild.kick(client.get_user(x))
-#             await msg.channel.send("Kicked")
-#     else:
-#         await msg.channel.send("Unknown mng command!")
+@client.event
+async def on_reaction_remove(reaction, user):
+    global groups
+    guild = reaction.message.guild
+    if str(reaction.message.id) in groups[guild.id]['reaction_msgs'].keys():
+        if str(reaction.emoji) == groups[guild.id]['reaction_msgs'][str(reaction.message.id)][0]:
+            await user.remove_roles(guild.get_role(int(groups[guild.id]['reaction_msgs'][str(reaction.message.id)][1])))
 
-
-# async def youtube(msg,client,groups):
-#     command = msg.content.split('/', 1)[1].split(' ')
-#     op = command[0]
-#     guild = msg.guild
-#     if 'youtube_ch' not in groups[guild.id].keys():
-#         groups[guild.id]['youtube_ch']={}
-#     if op=="set":
-#         groups[guild.id]['youtube_ch'][str(command[1])]=''
-#         await msg.channel.send("Created")
-#     elif op=="remove":
-#         groups[guild.id]['youtube_ch'].pop(str(command[1]))
-#         await msg.channel.send("Removed")
-#     elif op=="lists":
-#         await msg.channel.send("".join(list(map(lambda x: str(x)+"\n",groups[guild.id]['youtube_ch'].keys()))))
-#     else:
-#         await msg.channel.send("Unkown youtube command!")
 
 async def admin(msg,client,groups):
     command = msg.content.split('/', 1)[1].split(' ')
@@ -457,8 +392,7 @@ async def debug(msg, client, groups):
                 await msg.channel.send(embed=embed)
         else:
             guild = msg.guild
-            embed = discord.Embed(title=guild.name+":" +
-                                  str(guild.id), description=guild.description)
+            embed = discord.Embed(title=guild.name+":" +str(guild.id), description=guild.description)
             embed.add_field(name="Emojis", value=guild.emojis, inline=False)
             embed.add_field(name="Region", value=guild.region, inline=False)
             embed.add_field(name="AFK", value="TimeOut: "+str(guild.afk_timeout) +
