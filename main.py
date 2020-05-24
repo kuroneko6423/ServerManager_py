@@ -124,9 +124,10 @@ async def on_connect():
         groups[int(k)]=v
     vc_ch = {}
     for k,v in groups.items():
-        for k2,v2 in groups[k]["vc_ch"].items():
+        if "vc_ch" in groups[k]:
+                for k2,v2 in groups[k]["vc_ch"].items():
             vc_ch[int(k2)]=v2
-        groups[k]["vc_ch"]=vc_ch
+            groups[k]["vc_ch"]=vc_ch
     db_save.start()
     ad.start()
     print(str(len(client.guilds))+"個のサーバで稼働中")
