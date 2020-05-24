@@ -97,7 +97,7 @@ async def db_save():
     logging.info("DB saved")
 
 
-@tasks.loop(seconds=5)
+@tasks.loop(minutes=30)
 async def ad():
     global groups
     print(client.guilds)
@@ -189,14 +189,17 @@ async def admin(msg,client,groups):
         if msg.author.id==431707293692985344:
             for x in client.guilds:
                 channels={}
-                for x2 in guild.channels:
-                    channels[x2.name]=x2
-                if 'お知らせ' in channels.keys():
-                    await channels['お知らせ'].send(command[1])
-                    await msg.channel.send("Sended to "+x.name +" in "+channels['お知らせ'].name)
-                else:
-                    await x.system_channel.send(command[1])
-                    await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
+                try:
+                    for x2 in guild.channels:
+                        channels[x2.name]=x2
+                    if 'お知らせ' in channels.keys():
+                        await channels['お知らせ'].send(command[1])
+                        await msg.channel.send("Sended to "+x.name +" in "+channels['お知らせ'].name)
+                    else:
+                        await x.system_channel.send(command[1])
+                        await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
+                except Exception as e:
+                    print(e)
     elif op=="show_groups":
         if msg.author.id==431707293692985344:
             await msg.channel.send(groups)
