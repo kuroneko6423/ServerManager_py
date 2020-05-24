@@ -103,11 +103,10 @@ async def db_save():
     logging.info("DB saved")
 
 
-@tasks.loop(minutes=60)
+@tasks.loop(seconds=10)
 async def ad():
     global groups
     global ads
-    print(client.guilds)
     for x in client.guilds:
         try:
             ad = random.choice(ads)
