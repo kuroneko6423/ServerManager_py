@@ -109,9 +109,10 @@ async def db_save():
 async def ad():
     global groups
     global ads
+    ad = random.choice(ads)
+    await client.get_guild(712633963260280873).get_channel(714020883299303534).send("_**[INFO]"+ad[0]+"**_\n"+ad[1])
     for x in client.guilds:
         try:
-            ad = random.choice(ads)
             embed = discord.Embed(title="[INFO]"+ad[0], description=ad[1], color=discord.Colour.red())
             await x.system_channel.send(embed=embed)
             print("Sended to "+str(x.name))
