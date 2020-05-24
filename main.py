@@ -22,8 +22,10 @@ logging.basicConfig(filename='logs/logger.log',format=formatter,level=logging.IN
 client = discord.Client()
 ads = [
     ["このbotをあなたのサーバに導入しませんか？","↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!"],
-    ["サポートが必要ですか？？","↓↓この記事を見てみよう！↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n作成者の連絡先も載ってるよ！"],
-    ["INFOの表示頻度が高すぎて、ウザい!?","↓↓このコマンドで表示頻度を設定しよう!\n`未対応です`"]
+    ["サポートが必要ですか？","↓↓この記事を見てみよう！↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n作成者の連絡先も載ってるよ！"],
+    ["INFOの表示頻度が高すぎて、ウザい!?","↓↓このコマンドで表示頻度を設定しよう!\n`未対応です`"],
+    ["バグや間違いを発見しましたか？","以下の招待リンクのdiscordグループにいるcronちゃんまでお声掛けください!\nhttps://discord.gg/pYknnfP"],
+    ["開発に参加したい？","以下のGithubへPull RequestやIssueなどをお願いします！\nhttps://github.com/cronree-91/ServerManager"]
     ]
 
 # @client.event
@@ -74,13 +76,13 @@ async def on_voice_state_update(member, before, after):
         guild = after.channel.guild
     else:
         guild = before.channel.guild
-    await guild.system_channel.send('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
+    await guild.system_channel.send('{0}が{1}から{2}へ移動しました。'.format(member, before.channel, after.channel))
     logging.info('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
     if before.channel != None:
         if before.channel.members == []:
             if before.channel.id in groups[guild.id]['vc_ch']:
                 if groups[guild.id]['vc_ch'][before.channel.id]['kind'] == 'LEAF':
-                    await guild.system_channel.send('{0} is deleted because the number of {0}s is now 0.'.format(before.channel.name))
+                    await guild.system_channel.send('{0}を、人数が{0}人になったため、削除します。'.format(before.channel.name))
                     v = groups[guild.id]['vc_ch'].pop(before.channel.id)
                     groups[guild.id]['vc_ch'][v['root']]['leafs'].remove(before.channel.id)
                     await before.channel.delete()
@@ -159,7 +161,7 @@ async def on_disconnect():
 async def on_guild_join(guild):
     global groups
     groups[guild.id] = {}
-    embed = discord.Embed(title="Hi!", description="I'm a server management bot!\nAnd if you don't know how to use it, just say '/help`!", color=discord.Colour.red())
+    embed = discord.Embed(title="こんにちは!", description="このBOTを導入してくださってありがとうございます。\nまずは、最初に`help`と話しかけてみましょう!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
     print(str(len(client.guilds))+"個のサーバで稼働中")
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
@@ -191,21 +193,23 @@ async def admin(msg,client,groups):
     guild = msg.guild
     logging.warning("Admin command %s by %s",msg.content,msg.author.id)
     if msg.author.id!=431707293692985344:
-        await msg.channel.send("This command can only be run by cronちゃん.")
+        await msg.channel.send("このコマンドは、cronちゃんのみが使用できるBOT管理者用コマンドです。")
         return(0)
     if op=="msg_create":
         if msg.author.id==431707293692985344:
             for x in client.guilds:
                 channels={}
                 try:
-                    for x2 in guild.channels:
-                        channels[x2.name]=x2
-                    if 'お知らせ' in channels.keys():
-                        await channels['お知らせ'].send(command[1])
-                        await msg.channel.send("Sended to "+x.name +" in "+channels['お知らせ'].name)
-                    else:
-                        await x.system_channel.send(command[1])
-                        await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
+                    # for x2 in guild.channels:
+                    #     channels[x2.name]=x2
+                    # if 'お知らせ' in channels.keys():
+                    #     await channels['お知らせ'].send(command[1])
+                    #     await msg.channel.send("Sended to "+x.name +" in "+channels['お知らせ'].name)
+                    # else:
+                    #     await x.system_channel.send(command[1])
+                    #     await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
+                    await x.system_channel.send(command[1])
+                    await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
                 except Exception as e:
                     print(e)
     elif op=="show_groups":
@@ -217,7 +221,7 @@ async def admin(msg,client,groups):
             res = subprocess.check_output(['tail', 'logs/logger.log'])
             await msg.channel.send(str(res).replace('\\n','\n'))
     else:
-        await msg.channel.send("Unkown admin command!")
+        await msg.channel.send("存在しないadminコマンドです。")
 
 async def request(msg, client, groups):
     command = msg.content.split('/', 1)[1].split(' ')
@@ -227,13 +231,13 @@ async def request(msg, client, groups):
         guild = msg.guild
         ch = await guild.categories[list(map(lambda x: x.name, guild.categories)).index(groups[guild.id]['req_categories'])].create_text_channel("Request【"+msg.content[11:]+"】")
         ch2 = await guild.categories[list(map(lambda x: x.name, guild.categories)).index(groups[guild.id]['req_ad_categories'])].create_text_channel("Request Admin【"+msg.content[11:]+"】")
-        await msg.channel.send("Created!")
+        await msg.channel.send("作成しました。")
     elif op=="close":
         if 'creater_role' not in groups[msg.guild.id]:
-            await msg.channel.send("Please set creater's role!")
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-            await msg.channel.send("It's only creater's command!")
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
             return(0)
         await msg.channel.delete()
     else:
@@ -245,10 +249,10 @@ async def role(msg, client, groups):
     guild = msg.guild
     if op == "create":
         if 'creater_role' not in groups[msg.guild.id]:
-            await msg.channel.send("Please set creater's role!")
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-            await msg.channel.send("It's only creater's command!")
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
             return(0)
         roles = {}
         result = ""
@@ -431,7 +435,7 @@ async def sets(msg, client, groups):
         guild = msg.guild
         if 'creater_role' in groups[guild.id]:
             if guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-                await msg.channel.send("Creater's role is already registered.")
+                await msg.channel.send("クリエイターロールは既に設定されています。")
                 return(0)
         roles = {}
         result = ""
@@ -453,56 +457,56 @@ async def sets(msg, client, groups):
         else:
             if int(m.content) in roles:
                 groups[guild.id]['creater_role'] = roles[int(m.content)]
-                await msg.channel.send(guild.get_role(roles[int(m.content)]).name+" has been registered as the role of creator.")
+                await msg.channel.send(guild.get_role(roles[int(m.content)]).name+"をクリエイターロールに設定しました。")
             else:
-                await msg.channel.send("Unknown reaction!")
+                await msg.channel.send("誤ったリアクションです！")
     elif op == "vc_categories":
         guild = msg.guild
         if 'creater_role' not in groups[msg.guild.id]:
-            await msg.channel.send("Please set creater's role!")
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-            await msg.channel.send("It's only creater's command!")
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
             return(0)
         else:
             categories = command[1]
             if categories not in list(map(lambda x: x.name,guild.categories)):
-                await msg.channel.send("Unkown categorie "+categories)
+                await msg.channel.send("カテゴリ"+categories+"は存在しません。")
                 return(0)
             groups[msg.guild.id]['vc_categories'] = msg.content[18:]
-            await msg.channel.send("I set "+msg.content[18:]+" to the voice chat category.")
+            await msg.channel.send(msg.content[18:]+"をVCカテゴリに設定しました。")
     elif op == "req_categories":
         guild = msg.guild
         if 'creater_role' not in groups[msg.guild.id]:
-            await msg.channel.send("Please set creater's role!")
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-            await msg.channel.send("It's only creater's command!")
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
             return(0)
         else:
             categories = command[1]
             if categories not in list(map(lambda x: x.name,guild.categories)):
-                await msg.channel.send("Unkown categorie "+categories)
+                await msg.channel.send("カテゴリ"+categories+"は存在しません。")
                 return(0)
             groups[msg.guild.id]['req_categories'] = msg.content[19:]
-            await msg.channel.send("I set "+msg.content[19:]+" to the request channel category.")
+            await msg.channel.send(msg.content[19:]+"をrequestカテゴリに設定しました。")
     elif op == "req_ad_categories":
         guild = msg.guild
         if 'creater_role' not in groups[msg.guild.id]:
-            await msg.channel.send("Please set creater's role!")
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-            await msg.channel.send("It's only creater's command!")
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
             return(0)
         else:
             categories = command[1]
             if categories not in list(map(lambda x: x.name,guild.categories)):
-                await msg.channel.send("Unkown categorie "+categories)
+                await msg.channel.send("カテゴリ"+categories+"は存在しません。")
                 return(0)
             groups[msg.guild.id]['req_ad_categories'] = msg.content[22:]
-            await msg.channel.send("I set "+msg.content[22:]+" to the request admin channel category.")
+            await msg.channel.send(msg.content[22:]+"をリクエスト(admin)カテゴリに設定しました。")
     else:
-        await msg.channel.send("Unkown set command!")
+        await msg.channel.send("存在しないsetコマンドです。")
 
 
 async def vc(msg, client, groups):
@@ -511,10 +515,10 @@ async def vc(msg, client, groups):
     if op == "create":
         guild = msg.guild
         if 'creater_role' not in groups[guild.id]:
-            await msg.channel.send("Please set creater's role!")
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
-            await msg.channel.send("It's only creater's command!")
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
             return(0)
         else:
             ch = await guild.categories[list(map(lambda x: x.name, guild.categories)).index(groups[guild.id]['vc_categories'])].create_voice_channel("➕ 新規作成["+msg.content[10:]+"]")
@@ -525,9 +529,9 @@ async def vc(msg, client, groups):
                 groups[msg.guild.id]['vc_ch'] = {}
                 groups[msg.guild.id]['vc_ch'][ch.id] = {
                     'kind': 'ROOT', 'name': msg.content[10:], 'leafs': [], 'root': None}
-            await msg.channel.send("Created!")
+            await msg.channel.send("作成しました！")
     else:
-        await msg.channel.send("Unknown vc command!")
+        await msg.channel.send("存在しないvcコマンドです。")
 
 
 client.run(TOKEN)
