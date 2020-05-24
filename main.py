@@ -106,10 +106,11 @@ async def db_save():
 @tasks.loop(minutes=60)
 async def ad():
     global groups
+    global ads
     print(client.guilds)
     for x in client.guilds:
         try:
-            ad = random.choice(ad)
+            ad = random.choice(ads)
             embed = discord.Embed(title="[INFO]"+ad[0], description=ad[1], color=discord.Colour.red())
             await x.system_channel.send(embed=embed)
         except Exception as e:
