@@ -100,6 +100,7 @@ async def db_save():
 @tasks.loop(seconds=5)
 async def ad():
     global groups
+    print(client.guilds)
     for x in client.guilds:
         try:
             embed = discord.Embed(title="このbotをあなたのサーバに導入しませんか？", description="↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!", color=discord.Colour.red())
