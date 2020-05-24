@@ -90,7 +90,7 @@ async def on_voice_state_update(member, before, after):
                 await member.move_to(ch)
 
 
-async def logs(msg):
+def logs(msg):
     print('[{0}]{1}'.format(time.time(), msg))
 
 @tasks.loop(seconds=10)
@@ -106,7 +106,7 @@ async def db_save():
 @client.event
 async def on_ready():
     global groups
-    await logs("Bot is ready!")
+    logs("Bot is ready!")
     logging.info("Bot is ready!")
 
 
@@ -114,7 +114,7 @@ async def on_ready():
 async def on_connect():
     global groups
     logging.info("Bot has logged in!")
-    await logs("Bot has logged in!")
+    logs("Bot has logged in!")
     que = Query()
     temp_groups = servers_db.search(que.id == 0)[0]['data']
     groups = {}
@@ -135,7 +135,7 @@ async def on_connect():
 async def on_disconnect():
     global groups
     logging.info("Bot has been logged out!")
-    await logs("Bot has been logged out!")
+    logs("Bot has been logged out!")
 
 
 @client.event
