@@ -161,7 +161,7 @@ async def on_disconnect():
 @client.event
 async def on_guild_join(guild):
     global groups
-    groups[guild.id] = {}
+    groups[guild.id] = {'vc_ch':{},'reaction_msgs':{}}
     embed = discord.Embed(title="こんにちは!", description="このBOTを導入してくださってありがとうございます。\nまずは、最初に`help`と話しかけてみましょう!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
     print(str(len(client.guilds))+"個のサーバで稼働中")
@@ -174,6 +174,8 @@ async def on_guild_join(guild):
 async def on_reaction_add(reaction, user):
     global groups
     guild = reaction.message.guild
+    if 'reaction_msgs' not in groups[guild.id]:
+
     if str(reaction.message.id) in groups[guild.id]['reaction_msgs'].keys():
         if str(reaction.emoji) == groups[guild.id]['reaction_msgs'][str(reaction.message.id)][0]:
             await user.add_roles(guild.get_role(int(groups[guild.id]['reaction_msgs'][str(reaction.message.id)][1])))
