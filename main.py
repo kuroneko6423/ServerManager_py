@@ -23,16 +23,18 @@ client = discord.Client()
 ads = [
     ["このbotをあなたのサーバに導入しませんか？","↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!"],
     ["サポートが必要ですか？","↓↓この記事を見てみよう！↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n作成者の連絡先も載ってるよ！"],
-    ["INFOの表示頻度が高すぎて、ウザい!?","↓↓このコマンドで表示頻度を設定しよう!\n`未対応です`"],
+    # ["INFOの表示頻度が高すぎて、ウザい!?","↓↓このコマンドで表示頻度を設定しよう!\n`未対応です`"],
     ["バグや間違いを発見しましたか？","以下の招待リンクのdiscordグループにいるcronちゃんまでお声掛けください!\nhttps://discord.gg/pYknnfP"],
     ["開発に参加したい？","以下のGithubへPull RequestやIssueなどをお願いします！\nhttps://github.com/cronree-91/ServerManager"]
     ]
+
 
 # @client.event
 # async def on_error(a,b):
 #     type_, value, traceback_ = sys.exc_info()
 #     logs("ERROR WAS HAPPEN! {0} {1}".format(str(type_),value))
 #     logging.error("ERROR WAS HAPPEN! %s %s",str(type_),value)
+
 
 @client.event
 async def on_message(msg):
@@ -110,7 +112,6 @@ async def ad():
     global groups
     global ads
     ad = random.choice(ads)
-    await client.get_channel(714020883299303534).send("_**[INFO]"+ad[0]+"**_\n"+ad[1])
     for x in client.guilds:
         try:
             embed = discord.Embed(title="[INFO]"+ad[0], description=ad[1], color=discord.Colour.red())
@@ -162,7 +163,7 @@ async def on_disconnect():
 async def on_guild_join(guild):
     global groups
     groups[guild.id] = {'vc_ch':{},'reaction_msgs':{}}
-    embed = discord.Embed(title="こんにちは!", description="このBOTを導入してくださってありがとうございます。\nまずは、最初に`help`と話しかけてみましょう!", color=discord.Colour.red())
+    embed = discord.Embed(title="こんにちは!", description="このBOTを導入してくださってありがとうございます。\nまずは、最初に`/help`と話しかけてみましょう!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
     print(str(len(client.guilds))+"個のサーバで稼働中")
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
@@ -223,6 +224,9 @@ async def admin(msg,client,groups):
             await msg.channel.send(file=discord.File("logs/logger.log",filename="logger.log"))
             res = subprocess.check_output(['tail', 'logs/logger.log'])
             await msg.channel.send(str(res).replace('\\n','\n'))
+    # elif op=="program":
+    #     if msg.author.id==431707293692985344:
+            
     else:
         await msg.channel.send("存在しないadminコマンドです。")
 
@@ -522,6 +526,9 @@ async def vc(msg, client, groups):
             return(0)
         elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
             await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
+            return(0)
+        elif 'vc_categories' not in groups[guild.id]:
+            await msg.channel.send("先にVCカテゴリを設定してください。")
             return(0)
         else:
             ch = await guild.categories[list(map(lambda x: x.name, guild.categories)).index(groups[guild.id]['vc_categories'])].create_voice_channel("➕ 新規作成["+msg.content[10:]+"]")
