@@ -218,7 +218,7 @@ async def admin(msg,client,groups):
                     print(e)
     elif op=="show_groups":
         if msg.author.id==431707293692985344:
-            await msg.channel.send(groups)
+            await msg.channel.send(file=discord.File("servers.json",filename="servers.json"))
     elif op=="logs":
         if msg.author.id==431707293692985344:
             await msg.channel.send(file=discord.File("logs/logger.log",filename="logger.log"))
