@@ -247,6 +247,8 @@ async def admin(msg,client,groups):
                                 guild.created_at.strftime("%Y/%m/%d"), inline=False)
                 embed.set_thumbnail(url=str(guild.banner_url))
                 await msg.channel.send(embed=embed)
+            except:
+                print("error")
  
     else:
         await msg.channel.send("存在しないadminコマンドです。")
