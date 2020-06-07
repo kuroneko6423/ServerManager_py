@@ -228,7 +228,26 @@ async def admin(msg,client,groups):
             await msg.channel.send(str(res).replace('\\n','\n'))
     # elif op=="program":
     #     if msg.author.id==431707293692985344:
-            
+    elif op=="invgr":
+        guilds = client.guilds
+        for x in guilds:
+            try:
+                guild = x
+                embed = discord.Embed(title=guild.name+":" +str(guild.id), description=guild.description)
+                embed.add_field(name="Emojis", value=guild.emojis, inline=False)
+                embed.add_field(name="Region", value=guild.region, inline=False)
+                embed.add_field(name="AFK", value="TimeOut: "+str(guild.afk_timeout) +
+                                "\nChannel:"+str(guild.afk_channel), inline=False)
+                embed.add_field(name="Icon", value=guild.icon, inline=False)
+                embed.add_field(name="Owner", value=client.get_user(guild.owner_id).name+"#" +
+                                client.get_user(guild.owner_id).discriminator+":"+str(guild.owner_id), inline=False)
+                invite = await guild.vanity_invite()
+                embed.add_field(name="Invite", value=str(invite), inline=False)
+                eembed.add_field(name="Created", value="at " +
+                                guild.created_at.strftime("%Y/%m/%d"), inline=False)
+                embed.set_thumbnail(url=str(guild.banner_url))
+                await msg.channel.send(embed=embed)
+ 
     else:
         await msg.channel.send("存在しないadminコマンドです。")
 
