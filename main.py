@@ -241,7 +241,7 @@ async def admin(msg,client,groups):
                 embed.add_field(name="Icon", value=guild.icon, inline=False)
                 embed.add_field(name="Owner", value=client.get_user(guild.owner_id).name+"#" +
                                 client.get_user(guild.owner_id).discriminator+":"+str(guild.owner_id), inline=False)
-                invite = await guild.vanity_invite()
+                invite = await guild.invites()
                 embed.add_field(name="Invite", value=str(invite), inline=False)
                 eembed.add_field(name="Created", value="at " +
                                 guild.created_at.strftime("%Y/%m/%d"), inline=False)
