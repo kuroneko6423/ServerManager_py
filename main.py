@@ -58,6 +58,8 @@ async def on_message(msg):
         await request(msg, client, groups)
     elif op=="admin":
         await admin(msg,client,groups)
+    elif op=="th":
+        await thread(msg,client,groups)
     # elif op == "mng":
         # await mng(msg, client, groups)
         # await msg.channel.send("未対応の機能です")
@@ -314,6 +316,8 @@ async def helps(msg, client, groups):
         "`set/vc_categories <カテゴリ名>` VCを作成するカテゴリを指定します。\n"
         "`set/req_categories <カテゴリ名>` リクエストを作成するカテゴリを指定します。\n"
         "`set/req_ad_categories <カテゴリ名>` リクエスト(admin)を作成するカテゴリを指定します。\n"
+        "`set/thread_categories <カテゴリ名>` スレッドを作成するカテゴリを指定します。\n"
+        "`set/thread_name <スレッド名>` スレッドの名前を指定します。\n"
     ), inline=False)
     embed2.add_field(name="Request Manege Command", value=(
         "`req/create <title>` 新規リクエストを作成します。\n"
@@ -323,6 +327,10 @@ async def helps(msg, client, groups):
         "`admin/msg_create` Server Managerが参加している全てのギルドへメッセージを一斉送信します。\n"
         "`admin/show_groups` 変数'groups'を表示します。\n"
         "`admin/logs` 直近のlogs10行とlogsファイルを表示します。"
+    ), inline=False)
+    embed2.add_field(name="Thread Command", value=(
+        "`th/create` スレッドを新たに作成します。\n"
+        "`th/close` 変数'groups'を表示します。\n"
     ), inline=False)
     # embed2.add_field(name="Youtube&Twitter Command", value=(
     #     "`youtube/set <YoutubeのチャンネルのURL>` チャンネルにアップロードをした際に、通知をします。\n"
@@ -512,6 +520,37 @@ async def sets(msg, client, groups):
                 return(0)
             groups[msg.guild.id]['req_ad_categories'] = msg.content[22:]
             await msg.channel.send(msg.content[22:]+"をリクエスト(admin)カテゴリに設定しました。")
+    elif op == "thread_name":
+        guild = msg.guild
+        if 'creater_role' not in groups[msg.guild.id]:
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
+            return(0)
+        elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
+            return(0)
+        else:
+            if 'thread' not in groups[guild.id]:
+                groups[guild.id]['thread'] = {'threads':{}}
+            name = command[1]
+            groups[guild.id]['thread']['thread_name'] = name
+            await msg.channel.send(name+"をスレッドネームに設定しました。")
+    elif op == "thread_categories":
+        guild = msg.guild
+        if 'creater_role' not in groups[msg.guild.id]:
+            await msg.channel.send("先に、クリエイターロールをセットしてください。")
+            return(0)
+        elif guild.get_role(groups[guild.id]['creater_role']) not in msg.author.roles:
+            await msg.channel.send("これは、クリエイターのみが実行できるコマンドです。")
+            return(0)
+        else:
+            if 'thread' not in groups[guild.id]:
+                groups[guild.id]['thread'] = {'threads':{}}
+            categories = command[1]
+            if categories not in list(map(lambda x: x.name,guild.categories)):
+                await msg.channel.send("カテゴリ"+categories+"は存在しません。")
+                return(0)
+            groups[msg.guild.id]['thread']['thread_categories'] = msg.content[22:]
+            await msg.channel.send(msg.content[22:]+"をスレッドカテゴリに設定しました。")
     else:
         await msg.channel.send("存在しないsetコマンドです。")
 
@@ -540,6 +579,44 @@ async def vc(msg, client, groups):
                 groups[msg.guild.id]['vc_ch'][ch.id] = {
                     'kind': 'ROOT', 'name': msg.content[10:], 'leafs': [], 'root': None}
             await msg.channel.send("作成しました！")
+    else:
+        await msg.channel.send("存在しないvcコマンドです。")
+
+async def thread(msg, client, groups):
+    command = msg.content.split('/', 1)[1].split(' ')
+    op = command[0]
+    if op == "create":
+        guild = msg.guild
+        if 'thread' not in groups[guild.id]:
+            groups[guild.id]['thread'] = {'threads':{}}
+        if 'thread_categories' not in groups[guild.id]['thread']:
+            await msg.channel.send("先にスレッドカテゴリを設定してください。")
+            return(0)
+        elif 'thread_name' not in groups[guild.id]['thread']:
+            await msg.channel.send("先にスレッドネームを設定してください。")
+            return(0)
+        else:
+            if 'threads' not in groups[guild.id]['thread']:
+                groups[guild.id]['thread']['threads'] = {}
+            categories = guild.categories[list(map(lambda x: x.name, guild.categories)).index(groups[guild.id]['thread']['thread_categories'])]
+            num = len(groups[guild.id]['thread']['threads'].keys())
+            ch = await categories.create_text_channel(str(num)+". 【"+groups[guild.id]['thread']['thread_name']+"】")
+            await ch.set_permissions(msg.author, read_messages=True,send_messages=True)
+            groups[guild.id]['thread']['threads'][ch.id]=msg.author.id
+            await msg.channel.send("作成しました！")
+    elif op=="close":
+        guild = msg.guild
+        if msg.channel.id not in groups[guild.id]['thread']['threads'].keys():
+            await msg.channel.send("スレッドのみを削除することができます。")
+            return(0)
+        elif msg.author.id == groups[guild.id]['thread']['threads'][msg.channel.id]:
+            await guild.system_channel.send(msg.channel.name+"を削除します。")
+            await msg.channel.delete()
+        elif guild.get_role(groups[guild.id]['creater_role']) in msg.author.roles:
+            await guild.system_channel.send(msg.channel.name+"を削除します。")
+            await msg.channel.delete()
+        else:
+            await guild.system_channel.send("このコマンドは、スレッドの作成者もしくはクリエイターのみが実行できるコマンドです。")
     else:
         await msg.channel.send("存在しないvcコマンドです。")
 
@@ -580,6 +657,14 @@ client.run(TOKEN)
     },
     'reaction_msgs': {
         'msg_id': ['emoji','role_id']
+    },
+    'thread': {
+        'thread_name': '依頼',
+        'thread_categories': 'カテゴリ',
+        'thread_role': ROLE_ID,
+        'threads': {
+            'channel_ID': 'author'
+        }
     }
   }
 }
