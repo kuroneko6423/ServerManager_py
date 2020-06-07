@@ -24,7 +24,7 @@ ads = [
     ["このbotをあなたのサーバに導入しませんか？","↓↓このbotの招待リンク↓↓\nhttps://discord.com/oauth2/authorize?client_id=699967735538384987&permissions=8&scope=bot\n↓↓詳しいことはこの記事に載ってるよ!↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n是非導入してみてね!"],
     ["サポートが必要ですか？","↓↓この記事を見てみよう！↓↓\nhttps://qiita.com/k439_/items/96b8a832642ace52b148\n作成者の連絡先も載ってるよ！"],
     # ["INFOの表示頻度が高すぎて、ウザい!?","↓↓このコマンドで表示頻度を設定しよう!\n`未対応です`"],
-    ["バグや間違いを発見しましたか？","以下の招待リンクのdiscordグループにいるcronちゃんまでお声掛けください!\nhttps://discord.gg/pYknnfP"],
+    ["バグや間違いを発見しましたか？","以下の招待リンクのdiscordグループにいるcronちゃんまでお声掛けください!\nhttps://discord.gg/AeP5att"],
     ["開発に参加したい？","以下のGithubへPull RequestやIssueなどをお願いします！\nhttps://github.com/cronree-91/ServerManager"]
     ]
 
