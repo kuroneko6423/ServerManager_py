@@ -244,7 +244,7 @@ async def admin(msg,client,groups):
                 invite = await guild.invites()
                 invites = list(map(lambda x: str(x),invite))
                 embed.add_field(name="Invite", value=invites, inline=False)
-                eembed.add_field(name="Created", value="at " +
+                embed.add_field(name="Created", value="at " +
                                 guild.created_at.strftime("%Y/%m/%d"), inline=False)
                 embed.set_thumbnail(url=str(guild.banner_url))
                 await msg.channel.send(embed=embed)
