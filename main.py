@@ -128,6 +128,7 @@ async def on_ready():
     global groups
     print("Bot is ready")
     logging.info("Bot is ready!")
+    get_members()
     ad.start()
 
 
@@ -171,6 +172,19 @@ async def on_guild_join(guild):
     await client.change_presence(activity=discord.Game(str(len(client.guilds))+"個のサーバで稼働中"))
     print(str(len(client.guilds))+"個のサーバで稼働中")
     logging.info("Guild joined")
+
+def get_members():
+    result = 0
+    for x in client.guilds:
+        try:
+            members = int(len(x.members))
+            result+=members
+            print(x.name)
+            print("Members: "+members)
+            print("MaxMembers: "+x.max_members)
+        except Exception as e:
+            print("error guilds!")
+    return result
 
 
 @client.event
