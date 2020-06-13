@@ -149,7 +149,7 @@ async def on_connect():
                 groups[k]["vc_ch"]=vc_ch
     db_save.start()
     print(str(len(client.guilds))+"servers | "+str(get_members()+" members")
-    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"servers | "+str(get_members()+" members")))
+    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"servers | "+str(get_members())+" members"))
     logging.info(str(len(client.guilds))+"個のサーバで稼働中")
 
 
@@ -167,7 +167,7 @@ async def on_guild_join(guild):
     embed = discord.Embed(title="こんにちは!", description="このBOTを導入してくださってありがとうございます。\nまずは、最初に`/help`と話しかけてみましょう!", color=discord.Colour.red())
     await guild.system_channel.send(embed=embed)
     print(str(len(client.guilds))+"servers | "+str(get_members()+" members"))
-    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"servers | "+str(get_members()+" members")))
+    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"servers | "+str(get_members())+" members"))
     logging.info("Guild joined")
 
 def get_members():
