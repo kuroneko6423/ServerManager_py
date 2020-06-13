@@ -176,14 +176,11 @@ async def on_guild_join(guild):
 def get_members():
     result = 0
     for x in client.guilds:
-        try:
-            members = int(len(x.members))
+            members = len(x.members)
             result+=members
             print(x.name)
-            print("Members: "+members)
-            print("MaxMembers: "+x.max_members)
-        except Exception as e:
-            print("error guilds!")
+            print("Members: "+str(members))
+            print("MaxMembers: "+str(x.max_members))
     return result
 
 
