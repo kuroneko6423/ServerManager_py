@@ -172,14 +172,13 @@ async def on_guild_join(guild):
 
 def get_members():
     result = 0
-
     for x in client.guilds:
         try:
             members = len(x.members)
+            print(members)
             result+=members
         except Exception as e:
             print("except!!")
-    
     return result
 
 
