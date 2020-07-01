@@ -128,6 +128,9 @@ async def on_ready():
     global groups
     print("Bot is ready")
     logging.info("Bot is ready!")
+    print(str(len(client.guilds))+"servers | "+str(get_members())+" members")
+    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"servers | "+str(get_members())+" members"))
+    logging.info(str(len(client.guilds))+"個のサーバで稼働中")
     ad.start()
 
 
@@ -148,9 +151,6 @@ async def on_connect():
                     vc_ch[int(k2)]=v2
                 groups[k]["vc_ch"]=vc_ch
     db_save.start()
-    print(str(len(client.guilds))+"servers | "+str(get_members())+" members")
-    await client.change_presence(activity=discord.Game(str(len(client.guilds))+"servers | "+str(get_members())+" members"))
-    logging.info(str(len(client.guilds))+"個のサーバで稼働中")
 
 
 @client.event
