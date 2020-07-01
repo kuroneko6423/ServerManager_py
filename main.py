@@ -174,7 +174,8 @@ def get_members():
     result = 0
     for x in client.guilds:
         try:
-            members = len(x.members)
+            members = int(len(x.members))
+            print(x.name)
             print(members)
             result+=members
         except Exception as e:
