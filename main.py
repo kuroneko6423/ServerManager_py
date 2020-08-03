@@ -117,7 +117,7 @@ async def on_voice_state_update(member, before, after):
                     text_ch = client.get_channel(groups[guild.id]['vc_ch'][after.channel.id]['text'])
                     await text_ch.set_permissions(member, read_messages=True,send_messages=True)
     except:
-        print( 'Guild: {0} VOICE_STATE_UPDATE ERROR' )
+        print( 'Guild: {0} VOICE_STATE_UPDATE ERROR'.format(guild.name) )
 
 
 @tasks.loop(seconds=10)
