@@ -39,7 +39,7 @@ ads = [
 def get_channel_from_name(guild,name):
     channels = {}
     for x in guild.channels:
-        channels[x.name]=x.id
+        channels[x.name]=x
     if name in channels:
         return channels[name]
     else:
@@ -112,7 +112,7 @@ async def on_voice_state_update(member, before, after):
                     await ch_text.set_permissions(guild.default_role, read_messages=False,send_messages=False)
                     groups[guild.id]['vc_ch'][ch.id] = {'kind': 'LEAF', 'name': groups[guild.id]['vc_ch'][after.channel.id]['name'], 'leafs': None, 'root': after.channel.id, 'text': ch_text.id}
                     groups[guild.id]['vc_ch'][after.channel.id]['leafs'].append(ch.id)
-                    await member.move_tif  
+                    await member.move_to(ch)
                 elif groups[guild.id]['vc_ch'][after.channel.id]['kind'] == 'LEAF':
                     text_ch = client.get_channel(groups[guild.id]['vc_ch'][after.channel.id]['text'])
                     await text_ch.set_permissions(member, read_messages=True,send_messages=True)
@@ -258,9 +258,8 @@ async def admin(msg,client,groups):
                         else:
                             if guild.text_channels[0] is not None:
                                 ch = guild.text_channels[0]
-                    
                     if ch is not None:
-                        await x.system_channel.send(" ".join(command[1:]))
+                        await ch.send(" ".join(command[1:]))
                         await msg.channel.send("Sended to `"+x.name+"` in `"+ch.name+"`")
                 except Exception as e:
                     print(e)
