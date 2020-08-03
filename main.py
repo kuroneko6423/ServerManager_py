@@ -263,7 +263,7 @@ async def admin(msg,client,groups):
                             await ch.send(" ".join(command[1:]))
                             await msg.channel.send("Sended to `"+x.name+"` in `"+ch.name+"`")
                         except Forbidden:
-                            await msg.channel.send("Guild:`"+x.name"`では`"+ch.name+"`に送る権限がありません。")
+                            await msg.channel.send("Guild:`"+x.name+"`では`"+ch.name+"`に送る権限がありません。")
                 except Exception as e:
                     print(e)
     elif op=="show_groups":
