@@ -245,19 +245,19 @@ async def admin(msg,client,groups):
                     # else:
                     #     await x.system_channel.send(command[1])
                     #     await msg.channel.send("Sended to "+x.name+" in "+x.system_channel.name)
-                    ch = guild.system_channel
-                    tmp = guild.system_channel
+                    ch = x.system_channel
+                    tmp = x.system_channel
 
-                    tmp = get_channel_from_name(guild,"お知らせ")
+                    tmp = get_channel_from_name(x,"お知らせ")
                     if tmp!=ch:
                         ch = tmp
                     else:
-                        tmp = get_channel_from_name(guild,"おしらせ")
+                        tmp = get_channel_from_name(x,"おしらせ")
                         if tmp!=ch:
                             ch = tmp
                         else:
-                            if guild.text_channels[0] is not None:
-                                ch = guild.text_channels[0]
+                            if x.text_channels[0] is not None:
+                                ch = x.text_channels[0]
                     if ch is not None:
                         try:
                             await ch.send(" ".join(command[1:]))
