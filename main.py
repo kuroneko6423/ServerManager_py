@@ -117,6 +117,7 @@ async def on_voice_state_update(member, before, after):
                     text_ch = client.get_channel(groups[guild.id]['vc_ch'][after.channel.id]['text'])
                     await text_ch.set_permissions(member, read_messages=True,send_messages=True)
     except:
+        logging.info('Guild: {0} VOICE_STATE_UPDATE ERROR'.format(guild.name))
         print( 'Guild: {0} VOICE_STATE_UPDATE ERROR'.format(guild.name) )
 
 
@@ -139,7 +140,8 @@ async def ad():
             await x.system_channel.send(embed=embed)
             print("Sended to "+str(x.name))
         except Exception as e:
-            print(e)
+            logging.info('ERROR: AD GUILD: {0}'.format(guild.name))
+            print('ERROR: AD GUILD: {0}'.format(guild.name))
 
 
 @client.event
