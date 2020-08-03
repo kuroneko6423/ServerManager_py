@@ -84,38 +84,40 @@ async def on_message(msg):
 
 @client.event
 async def on_voice_state_update(member, before, after):
-    global groups
-    if before.channel==None:
-        guild = after.channel.guild
-    else:
-        guild = before.channel.guild
-    await guild.system_channel.send('{0}が{1}から{2}へ移動しました。'.format(member, before.channel, after.channel))
-    logging.info('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
-    if before.channel != None:
-        if before.channel.id in groups[guild.id]['vc_ch']:
-            if groups[guild.id]['vc_ch'][before.channel.id]['kind'] == 'LEAF':
-                if before.channel.members == []:
-                    await guild.system_channel.send('{0}を、人数が{0}人になったため、削除します。'.format(before.channel.name))
-                    v = groups[guild.id]['vc_ch'].pop(before.channel.id)
-                    groups[guild.id]['vc_ch'][v['root']]['leafs'].remove(before.channel.id)
-                    await before.channel.delete()
-                    await client.get_channel(v['text']).delete()
-                else:
-                    text_ch = client.get_channel(groups[guild.id]['vc_ch'][before.channel.id]['text'])
-                    await text_ch.set_permissions(member, read_messages=False,send_messages=False)
-    if after.channel != None:
-        if after.channel.id in groups[guild.id]['vc_ch']:
-            if groups[guild.id]['vc_ch'][after.channel.id]['kind'] == 'ROOT':
-                ch = await guild.categories[list(map(lambda x: x.name, after.channel.guild.categories)).index(groups[guild.id]['vc_categories'])].create_voice_channel('No.{0} [{1}]'.format(len(groups[guild.id]['vc_ch'][after.channel.id]['leafs'])+1, groups[guild.id]['vc_ch'][after.channel.id]['name']))
-                ch_text = await guild.categories[list(map(lambda x: x.name, after.channel.guild.categories)).index(groups[guild.id]['vc_categories'])].create_text_channel('{1}_{0}'.format(len(groups[guild.id]['vc_ch'][after.channel.id]['leafs'])+1, groups[guild.id]['vc_ch'][after.channel.id]['name']))
-                await ch_text.set_permissions(guild.default_role, read_messages=False,send_messages=False)
-                groups[guild.id]['vc_ch'][ch.id] = {'kind': 'LEAF', 'name': groups[guild.id]['vc_ch'][after.channel.id]['name'], 'leafs': None, 'root': after.channel.id, 'text': ch_text.id}
-                groups[guild.id]['vc_ch'][after.channel.id]['leafs'].append(ch.id)
-                await member.move_tif  
-            elif groups[guild.id]['vc_ch'][after.channel.id]['kind'] == 'LEAF':
-                text_ch = client.get_channel(groups[guild.id]['vc_ch'][after.channel.id]['text'])
-                await text_ch.set_permissions(member, read_messages=True,send_messages=True)
-
+    try:
+        global groups
+        if before.channel==None:
+            guild = after.channel.guild
+        else:
+            guild = before.channel.guild
+        await guild.system_channel.send('{0}が{1}から{2}へ移動しました。'.format(member, before.channel, after.channel))
+        logging.info('{0} moved from {1} to {2}'.format(member, before.channel, after.channel))
+        if before.channel != None:
+            if before.channel.id in groups[guild.id]['vc_ch']:
+                if groups[guild.id]['vc_ch'][before.channel.id]['kind'] == 'LEAF':
+                    if before.channel.members == []:
+                        await guild.system_channel.send('{0}を、人数が{0}人になったため、削除します。'.format(before.channel.name))
+                        v = groups[guild.id]['vc_ch'].pop(before.channel.id)
+                        groups[guild.id]['vc_ch'][v['root']]['leafs'].remove(before.channel.id)
+                        await before.channel.delete()
+                        await client.get_channel(v['text']).delete()
+                    else:
+                        text_ch = client.get_channel(groups[guild.id]['vc_ch'][before.channel.id]['text'])
+                        await text_ch.set_permissions(member, read_messages=False,send_messages=False)
+        if after.channel != None:
+            if after.channel.id in groups[guild.id]['vc_ch']:
+                if groups[guild.id]['vc_ch'][after.channel.id]['kind'] == 'ROOT':
+                    ch = await guild.categories[list(map(lambda x: x.name, after.channel.guild.categories)).index(groups[guild.id]['vc_categories'])].create_voice_channel('No.{0} [{1}]'.format(len(groups[guild.id]['vc_ch'][after.channel.id]['leafs'])+1, groups[guild.id]['vc_ch'][after.channel.id]['name']))
+                    ch_text = await guild.categories[list(map(lambda x: x.name, after.channel.guild.categories)).index(groups[guild.id]['vc_categories'])].create_text_channel('{1}_{0}'.format(len(groups[guild.id]['vc_ch'][after.channel.id]['leafs'])+1, groups[guild.id]['vc_ch'][after.channel.id]['name']))
+                    await ch_text.set_permissions(guild.default_role, read_messages=False,send_messages=False)
+                    groups[guild.id]['vc_ch'][ch.id] = {'kind': 'LEAF', 'name': groups[guild.id]['vc_ch'][after.channel.id]['name'], 'leafs': None, 'root': after.channel.id, 'text': ch_text.id}
+                    groups[guild.id]['vc_ch'][after.channel.id]['leafs'].append(ch.id)
+                    await member.move_tif  
+                elif groups[guild.id]['vc_ch'][after.channel.id]['kind'] == 'LEAF':
+                    text_ch = client.get_channel(groups[guild.id]['vc_ch'][after.channel.id]['text'])
+                    await text_ch.set_permissions(member, read_messages=True,send_messages=True)
+    except:
+        print( 'Guild: {0} VOICE_STATE_UPDATE ERROR' )
 
 
 @tasks.loop(seconds=10)
