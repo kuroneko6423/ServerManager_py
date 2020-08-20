@@ -1,0 +1,55 @@
+msg:
+  jp:
+    on_join_message:
+      default: "%user%%newline%ようこそ、このサーバーへ!"
+    firstjoin:
+      title: "こんにちは!"
+      description: "このBOTを導入してくださってありがとうございます。\nまずは、最初に`set/lang`と話しかけて、言語の設定をしてください!"
+    permission:
+      dm: "`%server%`にて、以下のメッセージを送信したところ、`%channel%`にメッセージを送信する権限がなかったため、失敗しました。"
+      ch: ":x: 権限がありません"
+    error:
+      ch: ":x: 内部エラーが発生しました。"
+    unknown:
+      ch: "`%command%`は存在しません。"
+    admin:
+      permission: "このコマンドは、cronちゃんのみが使用できるBOT管理者用コマンドです。"
+    msg:
+      join:
+        message: "参加時のメッセージ表示設定を%value%にしました。"
+    help:
+      title: "Help"
+      description: "以下の記事に詳しい使い方が載っています。是非ご参照ください。\nhttps://qiita.com/k439_/items/96b8a832642ace52b148"
+      set:
+        title: "Setting Command"
+        value:
+          - "`set/lang` 言語を指定します。"
+          - "`set/creater_role` クリエイターロールを設定します。設定することにより、設定したロールしか管理コマンドを実行できなくなります。"
+      msg:
+        title: "Message Command"
+        value:
+          - "`msg/join on|off` メンバーが参加した際のメッセージを表示するか設定します。%user%がメンション、%name%が、参加したユーザー名に置換されます。"
+          - "`msg/join_message [送信するメッセージ]` メンバーが参加した際のメッセージを設定します。%user%がメンション、%name%が参加したユーザー名、%newline%が改行に置換されます。"
+          - "`msg/set_channel` メンバーの入退出のメッセージを送信するチャンネルを指定します。"
+    ads:
+      - 'jp1'
+      - 'jp2'
+
+
+
+  en:
+    firstjoin:
+      title: "Hello!"
+      description: "Thank you for invite this bot!\nFirst, please talk me `set/lang` to set up language.\nThis translate is not always right."
+    permission:
+      dm: "On `%server%`, I don't have send-message permission in channel `%channel%`."
+      ch: ":x: Permission denid"
+    error:
+      ch: ":x: Internal Error has happen."
+    unknown:
+      ch: "command `%command` is not exist."
+    admin:
+      permission: "This command is for BOT administrators, which is available only to `cronちゃん`."
+    ads:
+      - 'en1'
+      - 'en2'
